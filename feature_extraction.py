@@ -1,6 +1,11 @@
 import pickle
 import tensorflow as tf
-# TODO: import Keras layers you need here
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten
+from keras.layers import Input
+import numpy as np
+from keras.models import Model
+
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -41,13 +46,26 @@ def main(_):
     print(X_train.shape, y_train.shape)
     print(X_val.shape, y_val.shape)
 
-    # TODO: define your model and hyperparams here
+    # define your model and hyperparams here
     # make sure to adjust the number of classes based on
     # the dataset
     # 10 for cifar10
     # 43 for traffic
+    nb_classes=len(np.unique(y_train))
+    
+    in_shape = X_train.shape[1:]
+    inp = Input(shape=in_shape)
+    
+    # train your model here
+    x = Flatten()(inp)
+    x = Dense(nb_classes, activation='softmax')(x)
+    model = Model(inp, x)
+    
+    print(model.layers)
+    model.compile('adam', 'sparse_categorical_crossentropy', ['accuracy'])
+    history = model.fit(X_train, y_train, nb_epoch=50, batch_size=256, validation_data=(X_val, y_val), shuffle=True)
 
-    # TODO: train your model here
+
 
 
 # parses flags and calls the `main` function above
